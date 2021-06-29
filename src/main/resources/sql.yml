@@ -1,0 +1,9 @@
+
+sql:
+  lab:
+    selectAccount: |
+      select account_id, account_name from lab.account_info
+      where user_id = :user_id
+
+    selectAccountList: |
+      select account_id, account_name from lab.account_info

@@ -1,0 +1,29 @@
+
+server:
+  port: 8080
+  tomcat:
+    max-connections: 10000
+    max-threads: 16
+    min-spare-threads: 4
+
+spring:
+  main:
+    banner-mode: off
+#  jackson:
+#    property-naming-strategy: SNAKE_CASE
+
+db:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://210.116.106.162:15432/djmcdb
+    username: djmc
+    password: djmc123.$
+    connection-timeout-ms: 10000
+    maximum-pool-size: 10
+    pool-name: db-pool
+    fetch-size: 100000
+
+app:
+  num: 100
+  ssh-host: djmc
+  ssh-key-file: ~/.ssh/djmc_bmt.pem

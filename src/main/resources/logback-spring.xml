@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+- Spring에서으로 Log를 Slack으로 받아보기
+https://rutgo-letsgo.tistory.com/125
+-->
+
+<configuration>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-./logs}/app.log}"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!--
+            <pattern>%green(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5p) ${PID:- } %t %cyan([%C:%M\(\):%L]) %msg%n%throwable</pattern>
+            -->
+            <pattern>%green(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5p) ${PID:- } %t %cyan([%-40.40logger{39} :%M\(\):%L]) %msg%n%throwable</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p ${PID:- } %t [%C:%M\(\):%L] %msg%n</pattern>
+        </encoder>
+        <file>${LOG_FILE}</file>
+        <prudent>false</prudent>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <cleanHistoryOnStart>${LOG_FILE_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <fileNamePattern>${LOG_FILE}_%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE:-10MB}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY:-7}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="SLACK" class="com.github.maricn.logback.SlackAppender">
+        <!--
+        <token>xoxp-855883976580-1005077461139-1009582090147-b80d3748eaf22a6ed3f5363340d5c24b</token>
+        <channel>#app-test-logs</channel>
+        <username>${HOSTNAME}</username>
+        <iconEmoji>:warning:</iconEmoji>
+         -->
+        <webhookUri>https://hooks.slack.com/services/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</webhookUri>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>:warning: %d{yyyy-MM-dd HH:mm:ss.SSS} %-5p ${PID:- } %t [%C:%M\(\):%L] %msg%n</pattern>
+        </layout>
+        <colorCoding>true</colorCoding>
+    </appender>
+
+    <appender name="ASYNC_SLACK" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ASYNC_SLACK"/>
+    </root>
+
+    <logger name="com.example.api" level="TRACE" />
+
+    <logger name="com.zaxxer.hikari.HikariConfig" level="DEBUG" />
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="INFO" />
+    <logger name="org.springframework.jdbc" level="INFO" />
+
+</configuration>
